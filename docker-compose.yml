@@ -10,7 +10,7 @@ services:
   prometheus:
     image: prom/prometheus:v2.49.0
     volumes:
-      - ./prometheus/:/etc/prometheus/
+      - /tutorial-environment/prometheus/:/etc/prometheus/
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
       - "--storage.tsdb.path=/prometheus"
@@ -47,8 +47,9 @@ services:
       - GF_AUTH_ANONYMOUS_ENABLED=true # removes login 1/2
       - GF_AUTH_BASIC_ENABLED=false # removes login 2/2
     volumes:
-      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
-
+      - /tutorial-environment/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+      - /tutorial-environment/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+      - /tutorial-environment/slo/generated/dashboards:/var/lib/grafana/dashboards/slo
   app:
     build: ./app
     ports:

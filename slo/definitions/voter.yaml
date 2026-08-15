@@ -1,0 +1,53 @@
+apiVersion: slo/v1
+
+service: grafana-news
+
+slos:
+  - name: availability
+    description: Percentage of requests that do not return 5xx responses
+
+    objective: 99.9
+    window: 30d
+
+    datasource:
+      type: prometheus
+      name: Prometheus
+
+    sli:
+      type: ratio
+
+      good:
+        query: |
+          sum(
+            rate(
+              tns_request_duration_seconds_count{
+                status_code!~"5.."
+              }[5m]
+            )
+          )
+
+      total:
+        query: |
+          sum(
+            rate(
+              tns_request_duration_seconds_count[5m]
+            )
+          )
+
+    dashboard:
+      enabled: true
+
+      panels:
+        - current_sli
+        - objective
+        - error_budget_remaining
+        - error_budget_consumed
+        - burn_rate
+        - request_rate
+        - error_rate
+
+    diagnostics:
+      logs:
+        datasource: Loki
+        query: |
+          {filename="/var/log/tns-app.log"} |= "error"
